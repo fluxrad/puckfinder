@@ -8,16 +8,33 @@ import (
 )
 
 type Rink struct {
-	RinkID int    `json:"id"`
-	URL    string `json:"url"`
-	APIURL string `json:"apiUrl"`
+	RinkID    int    `json:"id"`
+	ShortName string `json:"shortName"`
+	URL       string `json:"url"`
+	API       string `json:"api"`
+}
+
+type RinkInfo struct {
+	RinkID int          `json:"id"`
+	Skates []*SkateInfo `json:"skateInfo"`
+}
+
+type SkateInfo struct {
+	SkateType string `json:"skateType"` // Drop-In, Stick and Puck, etc.
+	StartTime int    `json:"startTime"`
+	EndTime   int    `json:"endTime"`
 }
 
 var Rinks []*Rink
 
 func init() {
 	Rinks = []*Rink{
-		&Rink{1, "http://recreation.du.edu", "http://denveruniv-web.ungerboeck.com/Calendar/Default.aspx?EventClassFilter=classFilter1&EventFormat=FULLCALENDARJSON"},
+		&Rink{
+			RinkID:    1,
+			ShortName: "University of Denver",
+			URL:       "http://recreation.du.edu",
+			API:       "http://denveruniv-web.ungerboeck.com/Calendar/Default.aspx?EventClassFilter=classFilter1&EventFormat=FULLCALENDARJSON",
+		},
 	}
 }
 
