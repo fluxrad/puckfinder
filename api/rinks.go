@@ -1,6 +1,8 @@
 package api
 
 import (
+	"io/ioutil"
+	"net/http"
 	"strconv"
 
 	log "github.com/Sirupsen/logrus"
@@ -9,17 +11,13 @@ import (
 
 // Store this in a database eventually
 type Rink struct {
-	RinkID    int    `json:"id"`
-	ShortName string `json:"shortName"`
-	URL       string `json:"url"`
-	API       string
-	Parser    string
-	Timeout   int
-}
-
-type RinkData struct {
-	*Rink  `json:"rink"`
-	Skates []*Skate `json:"skates"`
+	RinkID    int     `json:"id"`
+	ShortName string  `json:"shortName"`
+	URL       string  `json:"url"`
+	API       string  `json:"api"`
+	Parser    string  `json:"-"`
+	Timeout   int     `json:"timeout"`
+	Skates    []Skate `json:"skates,omitempty"`
 }
 
 type Skate struct {
@@ -28,27 +26,53 @@ type Skate struct {
 	EndTime   int    `json:"endTime"`
 }
 
-func fetchRinkInfo(i int) (*RinkData, error) {
-	var d RinkData
+// Return a fully initialized copy of the Rink
+func NewRink(i int) (*Rink, error) {
+	r := Rinks[i]
+	err := r.GetSkates()
+	if err != nil {
+		return nil, err
+	}
+	return r, nil
+}
 
-	// SELECT rinkID, api, parser, timeout FROM rink_info
-	d.Rink = Rinks[i]
-
-	skates, found := Cache.Get(strconv.Itoa(d.RinkID))
+// We need a getter to setup the thing.
+func (r *Rink) GetSkates() error {
+	skates, found := Cache.Get(strconv.Itoa(r.RinkID))
 	if found {
-		d.Skates = skates.([]*Skate)
-		return &d, nil
+		r.Skates = skates.([]Skate)
+		return nil
 	}
 
-	skates, err := fetchSkates(&d)
+	skates, err := fetchSkateData(r.API, r.Parser)
 	if err != nil {
 		log.Error(err)
 	}
-	Cache.Set(strconv.Itoa(d.RinkID), skates, cache.DefaultExpiration)
+	Cache.Set(strconv.Itoa(r.RinkID), skates, cache.DefaultExpiration)
 
-	return &d, nil
+	return nil
 }
 
-func fetchSkates(r *RinkData) ([]*Skate, error) {
-	return nil, nil
+func fetchSkateData(api string, parser string) ([]Skate, error) {
+	var skates []Skate
+	var p SkateParser
+
+	resp, err := http.Get(api)
+	if err != nil {
+		log.Error("Could not retrieve data: %s", err)
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+
+	switch parser {
+	case `calendarjson`:
+		p = &CalendarJSON{}
+	}
+
+	skates, err = p.Parse(body)
+	if err != nil {
+		log.Error("Could not parse skates: %s", err)
+	}
+
+	return skates, nil
 }
