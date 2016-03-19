@@ -21,7 +21,7 @@ func init() {
 		RinkID:    1,
 		ShortName: "University of Denver",
 		URL:       "http://recreation.du.edu",
-		API:       "http://denveruniv-web.ungerboeck.com/Calendar/Default.aspx?EventClassFilter=classFilter1&EventFormat=FULLCALENDARJSON",
+		API:       "http://denveruniv-web.ungerboeck.com/Calendar/Default.aspx?&EventClassFilter=classFilter1&EventFilter=&EventSearchTerms=&EventFormat=FULLCALENDARJSON&EventSingleClassFilter=IAH",
 		Parser:    "calendarjson",
 		Timeout:   600,
 	}

@@ -1,15 +1,14 @@
 package api
 
 import (
-	"io/ioutil"
-	"net/http"
 	"strconv"
+	"time"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/patrickmn/go-cache"
 )
 
-// Store this in a database eventually
+// Rink is an object containing information about a particular facility
 type Rink struct {
 	RinkID    int    `json:"id"`
 	ShortName string `json:"shortName"`
@@ -19,13 +18,16 @@ type Rink struct {
 	Timeout   int    `json:"timeout"`
 }
 
+// Skate contains information about a specific skating event
 type Skate struct {
 	Type      string `json:"type"` // Drop-In, Stick and Puck, etc.
 	StartTime int    `json:"startTime"`
 	EndTime   int    `json:"endTime"`
 }
 
-// We need a getter to setup the thing.
+// Skates returns a list of Skates for a particular Rink. If the data doesn't
+// currently exist in the cache, or has expired, it will be fetched, and
+// cached.
 func (r *Rink) Skates() []*Skate {
 	skates, found := Cache.Get(strconv.Itoa(r.RinkID))
 	if found {
@@ -41,27 +43,24 @@ func (r *Rink) Skates() []*Skate {
 	return skates.([]*Skate)
 }
 
+// fetchSkateData fetches skate information from the target API and returns it
+// as an slice of pointers to Skate
 func fetchSkateData(api string, parser string) ([]*Skate, error) {
 	var skates []*Skate
 	var p SkateParser
 
-	resp, err := http.Get(api)
-	if err != nil {
-		log.Error("Could not retrieve data: %s", err)
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Error("Could not read body for %s: %s", api, err)
-	}
-
 	switch parser {
 	case `calendarjson`:
-		p = new(CalendarJSONParser)
+		t := time.Now()
+		p = NewCalendarJSONParser(api, t.Format("2006-01-02"), t.Add(720*time.Hour).Format("2006-01-02"))
 	}
 
-	skates, err = p.Parse(body)
+	data, err := p.Fetch()
+	if err != nil {
+		log.Error("Error fetching data: ", err)
+	}
+
+	skates, err = p.Parse(data)
 	if err != nil {
 		log.Error("Could not parse skates: %s", err)
 	}

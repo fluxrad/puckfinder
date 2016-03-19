@@ -9,15 +9,19 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// RinksReponse is a response object containing an array of Rink metadata.
 type RinksResponse struct {
 	Rinks []*Rink `json:"rinks"`
 }
 
+// RinkIDResponse contains information about a specific rink and its skates
 type RinksIDResponse struct {
-	Rink   `json:"rink"`
+	*Rink  `json:"rink"`
 	Skates []*Skate `json:"skates"`
 }
 
+// RinksHandler returns a RinksResponse object, containing metadata bout all
+// Rinks in the database.
 func RinksHandler(w http.ResponseWriter, r *http.Request) {
 	// convert to a slice rather than a map so we can marshal it
 	var rinks []*Rink
@@ -36,6 +40,8 @@ func RinksHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(resp)
 }
 
+// RinksIDHandler writes a JSON response object containing Rink and Skate
+// information specific to a particular RinkID
 func RinksIDHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
@@ -46,7 +52,7 @@ func RinksIDHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Eventually fetch this from a DB or something
-	rink := *Rinks[i]
+	rink := Rinks[i]
 	rir := &RinksIDResponse{
 		Rink:   rink,
 		Skates: rink.Skates(),

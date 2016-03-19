@@ -2,15 +2,25 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"net/http"
+	"strconv"
+	"time"
 
 	log "github.com/Sirupsen/logrus"
 )
 
 type SkateParser interface {
 	Parse(b []byte) ([]*Skate, error)
+	Fetch() ([]byte, error)
 }
 
-type CalendarJSONParser struct{}
+type CalendarJSONParser struct {
+	URL   string // URL to the API
+	Start string // YYYY-MM-DD
+	End   string // YYYY-MM-DD
+}
 
 type CalendarJSONEvents []*CalendarJSONEvent
 
@@ -31,6 +41,33 @@ type CalendarJSONEvent struct {
 	Title                       string `json:"title"`
 }
 
+// NewCalendarJSONParser returns a pointer to an initialized
+// CalendarJSONParser
+func NewCalendarJSONParser(url string, start string, end string) *CalendarJSONParser {
+	c := &CalendarJSONParser{
+		URL:   url,
+		Start: start,
+		End:   end,
+	}
+	return c
+}
+
+func (c *CalendarJSONParser) Fetch() ([]byte, error) {
+	query := fmt.Sprintf("%s&start=%s&end=%s", c.URL, c.Start, c.End)
+	resp, err := http.Get(query)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	return body, nil
+}
+
 func (c *CalendarJSONParser) Parse(b []byte) ([]*Skate, error) {
 	var skates []*Skate
 	var events CalendarJSONEvents
@@ -43,8 +80,8 @@ func (c *CalendarJSONParser) Parse(b []byte) ([]*Skate, error) {
 	for _, v := range events {
 		s := &Skate{
 			Type:      v.Title,
-			StartTime: parseTime(v.Start),
-			EndTime:   parseTime(v.End),
+			StartTime: parseTime(time.RFC3339, v.Start),
+			EndTime:   parseTime(time.RFC3339, v.End),
 		}
 		skates = append(skates, s)
 	}
@@ -52,6 +89,18 @@ func (c *CalendarJSONParser) Parse(b []byte) ([]*Skate, error) {
 	return skates, nil
 }
 
-func parseTime(t string) int {
-	return 0
+func parseTime(format string, t string) int {
+	tiem, err := time.Parse(format, t)
+	if err != nil {
+		log.Error("Couldn't parse time: ", err)
+		return 0
+	}
+
+	u, err := strconv.Atoi(tiem.Format(time.UnixDate))
+	if err != nil {
+		log.Error("Couldn't convert time to unix time: ", err)
+		return 0
+	}
+
+	return u
 }
