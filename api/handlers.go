@@ -37,6 +37,8 @@ func RinksHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.Write([]byte(err.Error()))
 	}
+
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.Write(resp)
 }
 
@@ -64,5 +66,6 @@ func RinksIDHandler(w http.ResponseWriter, r *http.Request) {
 		// Write an error here too
 	}
 
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.Write(resp)
 }

@@ -20,9 +20,9 @@ type Rink struct {
 
 // Skate contains information about a specific skating event
 type Skate struct {
-	Type      string `json:"type"` // Drop-In, Stick and Puck, etc.
-	StartTime int    `json:"startTime"`
-	EndTime   int    `json:"endTime"`
+	Type      string    `json:"type"` // Drop-In, Stick and Puck, etc.
+	StartTime time.Time `json:"startTime"`
+	EndTime   time.Time `json:"endTime"`
 }
 
 // Skates returns a list of Skates for a particular Rink. If the data doesn't
@@ -31,9 +31,11 @@ type Skate struct {
 func (r *Rink) Skates() []*Skate {
 	skates, found := Cache.Get(strconv.Itoa(r.RinkID))
 	if found {
+		log.Debug("Found cached data. Returning it")
 		return skates.([]*Skate)
 	}
 
+	log.Debug("Did not find cached data. Fetching")
 	skates, err := fetchSkateData(r.API, r.Parser)
 	if err != nil {
 		log.Error(err)
@@ -51,16 +53,15 @@ func fetchSkateData(api string, parser string) ([]*Skate, error) {
 
 	switch parser {
 	case `calendarjson`:
-		t := time.Now()
-		p = NewCalendarJSONParser(api, t.Format("2006-01-02"), t.Add(720*time.Hour).Format("2006-01-02"))
+		p = NewCalendarJSONParser(api)
 	}
 
-	data, err := p.Fetch()
+	skateData, err := p.Fetch()
 	if err != nil {
 		log.Error("Error fetching data: ", err)
 	}
 
-	skates, err = p.Parse(data)
+	skates, err = p.Parse(skateData)
 	if err != nil {
 		log.Error("Could not parse skates: %s", err)
 	}
