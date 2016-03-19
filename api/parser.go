@@ -32,10 +32,10 @@ type CalendarJSONData struct {
 
 func (c *CalendarJSON) Parse(b []byte) ([]*Skate, error) {
 	var skates []*Skate
-	var cjd []CalendarJSONData
+	var cjd []*CalendarJSONData
 
-	if err := json.Unmarshal(b, cjd); err != nil {
-		log.Error("Could not unmarshal json data: %s", err)
+	if err := json.Unmarshal(b, &cjd); err != nil {
+		log.Error("Could not parse json data: ", err)
 		return nil, err
 	}
 
