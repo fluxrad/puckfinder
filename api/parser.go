@@ -10,10 +10,11 @@ type SkateParser interface {
 	Parse(b []byte) ([]*Skate, error)
 }
 
-type CalendarJSON struct {
-}
+type CalendarJSONParser struct{}
 
-type CalendarJSONData struct {
+type CalendarJSONEvents []*CalendarJSONEvent
+
+type CalendarJSONEvent struct {
 	AllDay                      string `json:"allDay"`
 	End                         string `json:"end"`
 	EndDate                     string `json:"endDate"`
@@ -30,16 +31,16 @@ type CalendarJSONData struct {
 	Title                       string `json:"title"`
 }
 
-func (c *CalendarJSON) Parse(b []byte) ([]*Skate, error) {
+func (c *CalendarJSONParser) Parse(b []byte) ([]*Skate, error) {
 	var skates []*Skate
-	var cjd []*CalendarJSONData
+	var events CalendarJSONEvents
 
-	if err := json.Unmarshal(b, &cjd); err != nil {
+	if err := json.Unmarshal(b, &events); err != nil {
 		log.Error("Could not parse json data: ", err)
 		return nil, err
 	}
 
-	for _, v := range cjd {
+	for _, v := range events {
 		s := &Skate{
 			Type:      v.Title,
 			StartTime: parseTime(v.Start),

@@ -58,7 +58,7 @@ func fetchSkateData(api string, parser string) ([]*Skate, error) {
 
 	switch parser {
 	case `calendarjson`:
-		p = &CalendarJSON{}
+		p = new(CalendarJSONParser)
 	}
 
 	skates, err = p.Parse(body)
