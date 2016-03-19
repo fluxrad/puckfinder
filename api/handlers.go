@@ -53,8 +53,9 @@ func RinksIDHandler(w http.ResponseWriter, r *http.Request) {
 		// Write an error here
 	}
 
-	// Eventually fetch this from a DB or something
+	// Eventually fetch this from a DB
 	rink := Rinks[i]
+
 	rir := &RinksIDResponse{
 		Rink:   rink,
 		Skates: rink.Skates(),

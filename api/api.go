@@ -25,4 +25,13 @@ func init() {
 		Parser:    "calendarjson",
 		Timeout:   600,
 	}
+
+	Rinks[2] = &Rink{
+		RinkID:    2,
+		ShortName: "Boulder Valley Ice",
+		URL:       "http://www.bvice.com",
+		API:       "http://bvice.pucksystems.com/ical_feed?tags=35499%252C492957%252C37560%252C37564%252C37561%252C37562%252C41822%252C101399%252C333682%252C35528%252C35529%252C35530",
+		Parser:    "ical",
+		Timeout:   600,
+	}
 }

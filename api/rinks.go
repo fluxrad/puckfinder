@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"strconv"
 	"time"
 
@@ -54,6 +55,12 @@ func fetchSkateData(api string, parser string) ([]*Skate, error) {
 	switch parser {
 	case `calendarjson`:
 		p = NewCalendarJSONParser(api)
+	case `ical`:
+		p = NewICALParser(api)
+	default:
+		err := errors.New("No such API type")
+		log.Error(err)
+		return nil, err
 	}
 
 	skateData, err := p.Fetch()
