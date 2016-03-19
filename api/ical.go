@@ -11,11 +11,6 @@ type ICALParser struct {
 	End   string
 }
 
-type ICALEvents []*ICALEvent
-
-type ICALEvent struct {
-}
-
 func NewICALParser(url string) *ICALParser {
 	p := &ICALParser{
 		URL: url,
@@ -39,8 +34,6 @@ func (i *ICALParser) Parse(b []byte) ([]*Skate, error) {
 
 	log.Debugf("fetching data from URL: %s", i.URL)
 	parserChan <- i.URL
-
-	const icalFormat = "20060102T010203Z"
 
 	outputChan := parser.GetOutputChan()
 	go func() {
