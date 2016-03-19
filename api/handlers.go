@@ -28,9 +28,17 @@ func RinkHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Eventually fetch this from a DB or something
-	rink := NewRink(i)
+	rink := Rinks[i]
 
-	resp, err := json.Marshal(rink)
+	rs := struct {
+		Rink   `json:"rink"`
+		Skates []Skate `json:"skates"`
+	}{
+		Rink:   *rink,
+		Skates: rink.Skates(),
+	}
+
+	resp, err := json.Marshal(rs)
 	if err != nil {
 		log.Error("Couldn't marshal rinks response: %s", err)
 		// Write an error here too

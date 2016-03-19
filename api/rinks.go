@@ -11,13 +11,12 @@ import (
 
 // Store this in a database eventually
 type Rink struct {
-	RinkID    int     `json:"id"`
-	ShortName string  `json:"shortName"`
-	URL       string  `json:"url"`
-	API       string  `json:"api"`
-	Parser    string  `json:"-"`
-	Timeout   int     `json:"timeout"`
-	Skates    []Skate `json:"skates,omitempty"`
+	RinkID    int    `json:"id"`
+	ShortName string `json:"shortName"`
+	URL       string `json:"url"`
+	API       string `json:"api"`
+	Parser    string `json:"-"`
+	Timeout   int    `json:"timeout"`
 }
 
 type Skate struct {
@@ -26,22 +25,11 @@ type Skate struct {
 	EndTime   int    `json:"endTime"`
 }
 
-// Return a fully initialized copy of the Rink
-func NewRink(i int) (*Rink, error) {
-	r := Rinks[i]
-	err := r.GetSkates()
-	if err != nil {
-		return nil, err
-	}
-	return r, nil
-}
-
 // We need a getter to setup the thing.
-func (r *Rink) GetSkates() error {
+func (r *Rink) Skates() []Skate {
 	skates, found := Cache.Get(strconv.Itoa(r.RinkID))
 	if found {
-		r.Skates = skates.([]Skate)
-		return nil
+		return skates.([]Skate)
 	}
 
 	skates, err := fetchSkateData(r.API, r.Parser)
@@ -50,7 +38,7 @@ func (r *Rink) GetSkates() error {
 	}
 	Cache.Set(strconv.Itoa(r.RinkID), skates, cache.DefaultExpiration)
 
-	return nil
+	return skates.([]Skate)
 }
 
 func fetchSkateData(api string, parser string) ([]Skate, error) {
