@@ -13,8 +13,8 @@ func main() {
 
 	// Handle API calls
 	s := r.PathPrefix("/api").Subrouter()
-	s.HandleFunc("/rinks", api.AllRinksHandler)
-	s.HandleFunc("/rinks/{rinkID}", api.RinkHandler)
+	s.HandleFunc("/rinks", api.RinksHandler)
+	s.HandleFunc("/rinks/{id}", api.RinksIDHandler)
 
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir("./static/")))
 	log.Fatal(http.ListenAndServe(":8080", r))

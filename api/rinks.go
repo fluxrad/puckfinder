@@ -15,7 +15,7 @@ type Rink struct {
 	ShortName string `json:"shortName"`
 	URL       string `json:"url"`
 	API       string `json:"api"`
-	Parser    string `json:"-"`
+	Parser    string `json:"parser"`
 	Timeout   int    `json:"timeout"`
 }
 
@@ -26,10 +26,10 @@ type Skate struct {
 }
 
 // We need a getter to setup the thing.
-func (r *Rink) Skates() []Skate {
+func (r *Rink) Skates() []*Skate {
 	skates, found := Cache.Get(strconv.Itoa(r.RinkID))
 	if found {
-		return skates.([]Skate)
+		return skates.([]*Skate)
 	}
 
 	skates, err := fetchSkateData(r.API, r.Parser)
@@ -38,11 +38,11 @@ func (r *Rink) Skates() []Skate {
 	}
 	Cache.Set(strconv.Itoa(r.RinkID), skates, cache.DefaultExpiration)
 
-	return skates.([]Skate)
+	return skates.([]*Skate)
 }
 
-func fetchSkateData(api string, parser string) ([]Skate, error) {
-	var skates []Skate
+func fetchSkateData(api string, parser string) ([]*Skate, error) {
+	var skates []*Skate
 	var p SkateParser
 
 	resp, err := http.Get(api)
@@ -50,7 +50,11 @@ func fetchSkateData(api string, parser string) ([]Skate, error) {
 		log.Error("Could not retrieve data: %s", err)
 	}
 	defer resp.Body.Close()
+
 	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Error("Could not read body for %s: %s", api, err)
+	}
 
 	switch parser {
 	case `calendarjson`:

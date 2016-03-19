@@ -3,6 +3,7 @@ package api
 import (
 	"time"
 
+	log "github.com/Sirupsen/logrus"
 	cache "github.com/patrickmn/go-cache"
 )
 
@@ -10,6 +11,8 @@ var Rinks map[int]*Rink
 var Cache *cache.Cache
 
 func init() {
+	log.SetLevel(log.DebugLevel)
+
 	Rinks = make(map[int]*Rink)
 	Cache = cache.New(10*time.Minute, 30*time.Second)
 
