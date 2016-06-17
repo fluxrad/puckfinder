@@ -8,3 +8,7 @@ Find drop-in hockey in your area
 ```
 go get github.com/fluxrad/puckfinder
 ```
+
+#### FAQ
+
+
