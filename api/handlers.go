@@ -20,7 +20,7 @@ type RinksIDResponse struct {
 	Skates []*Skate `json:"skates"`
 }
 
-// RinksHandler returns a RinksResponse object, containing metadata bout all
+// RinksHandler returns a RinksResponse object, containing metadata about all
 // Rinks in the database.
 func RinksHandler(w http.ResponseWriter, r *http.Request) {
 	// convert to a slice rather than a map so we can marshal it
