@@ -13,12 +13,17 @@ function updateTable(id, tableId) {
 
 function updateHTMLForTable(tableId, data) {
   var skateData = '';
+
+  if (data.skates == null) {
+    data.skates = {};
+  }
+
   $.each(data.skates, function(index, value) {
     skateData += '<tr>';
     skateData += '<td>' + value.type + '</td><td>' + value.startTime + '</td><td>' + value.endTime + '</td>';
     skateData += '</tr>';
-    console.log("skateData is" + skateData);
   });
 
   $('table.co-skates tbody').html(skateData);
 };
+
