@@ -17,17 +17,19 @@
     <![endif]-->
   </head>
   <body>
-    <div class="header">
-      <h1>Puckfinder</h1>
-    </div>
     <div class="container">
+      <div class="row">
+        <div class="col-sm-12">
+          <h1>Puckfinder</h1>
+        </div>
+      </div>
       <div class="row">
         <div class="col-sm-2">
           <button type="button" class="btn btn-primary btn-block" name="du" onclick="updateTable('1', 'co-skates')">University of Denver</button>
           <button type="button" class="btn btn-primary btn-block" name="bvice" onclick="updateTable('2', 'co-skates')">Boulder Valley Ice</button>
         </div>
         <div class="col-sm-10">
-	  <table class="table co-skates">
+	  <table class="table co-skates table-striped">
 	    <thead>
 	      <tr>
 	        <th>Type</th>
@@ -35,8 +37,7 @@
 	        <th>End</th>
 	      </tr>
 	    </thead>
-	    <tbody>
-	    </tbody>
+            <tbody><!-- js will update table body --> </tbody>
 	  </table>
         </div>
       </div>
