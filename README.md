@@ -3,11 +3,29 @@ Puckfinder
 
 Find drop-in hockey in your area
 
-#### Install
+## Install
 
 ```
 go get github.com/fluxrad/puckfinder
 ```
 
-#### FAQ
+## Develop
 
+* In Docker (recommended)
+
+```
+docker-compose build
+docker-compose up
+```
+
+* Running Go natively
+
+```
+go run ./main.go
+```
+
+## Build
+
+```
+docker build
+```
