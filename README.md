@@ -1,3 +1,5 @@
+[![Docker Repository on Quay](https://quay.io/repository/fluxrad/puckfinder/status "Docker Repository on Quay")](https://quay.io/repository/fluxrad/puckfinder)
+
 Puckfinder
 ==========
 
